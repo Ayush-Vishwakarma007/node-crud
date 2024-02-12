@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors'); // Import cors module
 const YAML = require('yaml');
 const fs = require('fs');
 const { Sequelize } = require('sequelize');
@@ -14,9 +15,12 @@ const sequelize = new Sequelize( databaseConfig[environment]['database'], databa
 });
 
 app.use(bodyParser.json());
+app.use(cors()); 
+
 const signupRouter = require('./src/auth-management/routes/signup');
 app.use('/auth/signup', signupRouter);
-
+const loginRouter = require('./src/auth-management/routes/login');
+app.use('/auth/login', loginRouter);
 
 sequelize.sync().then(() => {
     app.listen(databaseConfig[environment]['port'], () => {

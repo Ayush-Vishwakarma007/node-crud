@@ -1,0 +1,7 @@
+development:
+  username: your_dev_db_username
+  password: your_dev_db_password
+  database: your_dev_database_name
+  host: dev_db_host
+  dialect: postgres
+  port: 4000

@@ -1,0 +1,7 @@
+production:
+  username: your_prod_db_username
+  password: your_prod_db_password
+  database: your_prod_database_name
+  host: prod_db_host
+  dialect: postgres
+  port: 80

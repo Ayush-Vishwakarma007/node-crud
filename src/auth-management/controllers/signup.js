@@ -2,7 +2,6 @@ const User = require('../models/user');
 const signupService = require('../services/signup');
 
 exports.signup = async (req, res) => {
-    console.log("Controller called__: ", req.body)
     try {
         const { name, email, password } = req.body;
         await signupService.createUser(name, email, password);

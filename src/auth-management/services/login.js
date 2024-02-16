@@ -11,6 +11,5 @@ exports.login = async (email, password) => {
     if (!isPasswordValid) {
         throw new Error("Invalid password");
     }
-
     return user;
 };

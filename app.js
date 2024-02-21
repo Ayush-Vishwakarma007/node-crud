@@ -5,6 +5,8 @@ const cors = require('cors'); // Import cors module
 const YAML = require('yaml');
 const fs = require('fs');
 const { Sequelize } = require('sequelize');
+const formatResponse = require('./middleware/formatResponse')
+const login_controller = require('./src/auth-management/controllers/login')
 const app = express();
 
 const environment = process.env.NODE_ENV || 'development';
@@ -15,12 +17,13 @@ const sequelize = new Sequelize( databaseConfig[environment]['database'], databa
 });
 
 app.use(bodyParser.json());
-app.use(cors()); 
+app.use(cors());
+app.use(formatResponse) 
 
 const signupRouter = require('./src/auth-management/routes/signup');
 app.use('/auth/signup', signupRouter);
 const loginRouter = require('./src/auth-management/routes/login');
-app.use('/auth/login', loginRouter);
+app.post('/auth/login', login_controller.login);
 
 sequelize.sync().then(() => {
     app.listen(databaseConfig[environment]['port'], () => {

@@ -1,13 +1,16 @@
+const { response } = require('express');
 const loginService = require('../services/login');
 
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
-        const user = await loginService.login(email, password);
-        delete user['dataValues'].password
-        res.status(200).json({ message: 'Login successful', user });
+        const user = await loginService.login(email, password); 
+        res.send(user, 200, 'Login Successful', 'Success');
     } catch (error) {
-        console.error("Error logging in: ", error);
-        res.status(401).json({ error: 'Invalid credentials' });
+        if (error.message === 'Invalid password') {
+            res.send(null, 401, 'Invalid email or password', 'BAD_RQUEST');
+        } else {
+            next(error);
+        }
     }
 };

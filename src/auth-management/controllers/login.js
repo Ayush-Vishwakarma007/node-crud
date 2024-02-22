@@ -10,7 +10,7 @@ exports.login = async (req, res) => {
         if (error.message === 'Invalid password') {
             res.send(null, 401, 'Invalid email or password', 'BAD_RQUEST');
         } else {
-            next(error);
+            res.send(null, 500, 'Internal server error', 'Error');
         }
     }
 };

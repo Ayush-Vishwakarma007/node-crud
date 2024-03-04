@@ -11,7 +11,7 @@ const generateResponse = (data, statusCode, description, status) => {
 
 const formatResponse = (req, res, next) => {
     const originalSend = res.send;
-    res.send = (data, statusCode, description, status) => {
+    res.send = function(data, statusCode = 200, description = 'Success', status = 'success') {
         try {
             const formattedResponse = generateResponse(data, statusCode, description, status);
             const jsonString = JSON.stringify(formattedResponse);

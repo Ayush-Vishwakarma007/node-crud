@@ -18,6 +18,25 @@ const User = sequelize.define('user', {
     role: {
         type: DataTypes.ENUM('ADMIN', 'CUSTOMER', 'CLIENT'), 
         defaultValue: 'CLIENT'
+    },
+    skills: {
+        type: DataTypes.ARRAY(DataTypes.STRING) 
+    },
+    phone: {
+        type: DataTypes.STRING
+    },
+    location: {
+        type: DataTypes.STRING
+    },
+    appointedBy: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: true,
+        defaultValue: [] 
+    },
+    applied_event:{
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: true,
+        defaultValue: [] 
     }
 });
 

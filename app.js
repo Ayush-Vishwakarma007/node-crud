@@ -21,14 +21,21 @@ app.use(cors());
 app.use(formatResponse) 
 
 const signupRouter = require('./src/auth-management/routes/signup');
-app.use('/auth/signup', signupRouter);
+app.use('/auth', signupRouter);
 const loginRouter = require('./src/auth-management/routes/login');
 app.post('/auth/login', login_controller.login);
+const eventRoutes = require('./src/auth-management/routes/event_post_route')
+app.use('/event', eventRoutes)
 
-sequelize.sync().then(() => {
-    app.listen(databaseConfig[environment]['port'], () => {
-        console.log(`Server is running on port ${databaseConfig[environment]['port']}`);
-    });
-}).catch(err => {
-    console.error('Error syncing database:', err);
-});
+
+sequelize.sync()
+  .then(() => {
+      console.log('Database synchronized successfully.');
+      app.listen(databaseConfig[environment]['port'], () => {
+          console.log(`Server is running on port ${databaseConfig[environment]['port']}`);
+      });
+  })
+  .catch(err => {
+      console.error('Error syncing database:', err);
+  });
+

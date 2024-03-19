@@ -19,6 +19,7 @@ async function createEvent(req, res) {
         const event = await eventService.createEvent(eventData);
         res.send(event, 200, "Event Posted Successfully", "Success")
     } catch (error) {
+        console.log("Failed to post event__: ", error)
         if (error.message === 'already exists') {
             res.send(null, 401, 'Event already exists', 'BAD_RQUEST');
         } else {

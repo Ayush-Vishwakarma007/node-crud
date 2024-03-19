@@ -5,7 +5,7 @@ const signupService = require('../services/signup');
 async function signup (req, res) {
     try {
         const { name, email, password, role, skills, location, phone } = req.body;
-        const createdUser = await signupService.createUser(name, email, password, role.toUpperCase(), skills, location, phone);
+        const createdUser = await signupService.createUser(name, email, password, role.toUpperCase(), skills, phone, location);
         console.log("Sign up service__: ", createdUser)
         res.send(createdUser, 200, "Sign up successfull", "Sucess")
     } catch (error) {
@@ -48,7 +48,6 @@ async function updateUser(req, res) {
 
 async function getUserById(req, res) {
     const  userId  = req.params;
-    console.log("user id controller__: ", userId)
     try {
         const userData = await signupService.getUserById(userId.id);
         res.send(userData, 200, "User data fetched successfully", "Success")
@@ -99,6 +98,17 @@ async function getUserByIds(req, res) {
     }
 }
 
+async function getChartData(req, res) {
+    try {
+      const chartData = await signupService.getChartData();
+      res.send(chartData, 200, "Active users data fetched successfully", "Success");
+    } catch (error) {
+      console.error('Error fetching chart data:', error);
+      res.send(null,500, "Something went wrong", "Error")
+    //   res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
 module.exports = {
     signup,
     getAllUsers,
@@ -107,5 +117,6 @@ module.exports = {
     getUserById,
     updateUserAppointedBy,
     getAllVolunteerUsersByCompanyId,
-    getUserByIds
+    getUserByIds,
+    getChartData
 }

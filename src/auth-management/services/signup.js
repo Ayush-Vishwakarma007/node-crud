@@ -156,6 +156,50 @@ async function getUserByIds(ids) {
     }
 }
 
+async function getChartData() {
+    try {
+      const activeUsers = await this.getAllUser();  
+      const users2024 = activeUsers.filter(user => {
+        const userYear = new Date(user.createdAt).getFullYear();
+        return userYear === 2023;
+      });
+  
+      const groupedByMonth = {};
+      users2024.forEach(user => {
+        const userMonth = new Date(user.createdAt).getMonth() + 1; 
+        if (!groupedByMonth[userMonth]) {
+          groupedByMonth[userMonth] = {
+            activeCompany: 0,
+            activeVolunteer: 0
+          };
+        }
+        if (user.role === 'COMPANY') {
+          groupedByMonth[userMonth].activeCompany++;
+        } else if (user.role === 'VOLUNTEER') {
+          groupedByMonth[userMonth].activeVolunteer++;
+        }
+      });
+  
+      const activeCompanyData = [];
+      const activeVolunteerData = [];
+      for (let month = 1; month <= 12; month++) {
+        const monthData = groupedByMonth[month] || { activeCompany: 0, activeVolunteer: 0 };
+        activeCompanyData.push(monthData.activeCompany);
+        activeVolunteerData.push(monthData.activeVolunteer);
+      }
+  
+      const chartData = [
+        { name: 'Active Company', data: activeCompanyData },
+        { name: 'Active Volunteer', data: activeVolunteerData }
+      ];
+  
+      return chartData;
+    } catch (error) {
+      console.error('Error fetching chart data:', error);
+      throw new Error('Error fetching chart data');
+    }
+  }
+
 
 module.exports = {
     createUser,
@@ -165,5 +209,6 @@ module.exports = {
     getUserById,
     updateUserAppointedBy,
     getAllVolunteerUsersByCompanyId,
-    getUserByIds
+    getUserByIds,
+    getChartData
 }

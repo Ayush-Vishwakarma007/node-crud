@@ -10,6 +10,8 @@ router.get('/getUser/:id', signupController.getUserById);
 router.put('/appointedBy/:id', signupController.updateUserAppointedBy)
 router.get('/volunteer-users/:id', signupController.getAllVolunteerUsersByCompanyId);
 router.post('/getByIds', signupController.getUserByIds);
+router.get('/bar-chart-data', signupController.getChartData);
+
 
 
 module.exports = router;

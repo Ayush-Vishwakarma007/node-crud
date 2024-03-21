@@ -5,7 +5,6 @@ const User = require('../models/user')
 async function getAllEvents() {
     const allEvents = await Event.findAll(); 
     const allData = []
-    // console.log("All Events__: ", allEvents[0]['dataValues'])
     allEvents.forEach(element => {
         allData.push(element['dataValues'])
     });

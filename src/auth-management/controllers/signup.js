@@ -109,6 +109,16 @@ async function getChartData(req, res) {
     }
   }
 
+  async function getLineChartData(req, res){
+    try {
+        const lineChartData = await signupService.getLineChartData();
+        res.send(lineChartData, 200, "Line chart data fetched successfully", "Success")
+    } catch (error) {
+       console.error(error) 
+       res.send(null, 500, "Something went wrong", "Error")
+    }
+  }
+
 module.exports = {
     signup,
     getAllUsers,
@@ -118,5 +128,6 @@ module.exports = {
     updateUserAppointedBy,
     getAllVolunteerUsersByCompanyId,
     getUserByIds,
-    getChartData
+    getChartData,
+    getLineChartData
 }

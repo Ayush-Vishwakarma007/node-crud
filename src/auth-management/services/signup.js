@@ -3,6 +3,7 @@ const { Sequelize, Op } = require('sequelize');
 const { user } = require('pg/lib/defaults');
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
+const eventService = require('./event_post_service')
 
 
 async function createUser(name, email, password, role, skills, phone, location) {
@@ -161,7 +162,7 @@ async function getChartData() {
       const activeUsers = await this.getAllUser();  
       const users2024 = activeUsers.filter(user => {
         const userYear = new Date(user.createdAt).getFullYear();
-        return userYear === 2023;
+        return userYear === 2024;
       });
   
       const groupedByMonth = {};
@@ -200,6 +201,73 @@ async function getChartData() {
     }
   }
 
+  async function getLineChartData(){
+    try {
+        const activeUsers = await this.getAllUser(); 
+        const allEvents = await eventService.getAllEvents();
+  
+        const users2024 = activeUsers.filter(user => {
+          const userYear = new Date(user.createdAt).getFullYear();
+          return userYear === 2024;
+        });
+  
+        const groupedByMonth = {};
+        const eventsByMonth = {};
+  
+        // Group users by month and count companies and volunteers
+        users2024.forEach(user => {
+          const userMonth = new Date(user.createdAt).getMonth() + 1; 
+          if (!groupedByMonth[userMonth]) {
+            groupedByMonth[userMonth] = {
+              activeCompany: 0,
+              activeVolunteer: 0
+            };
+          }
+          if (user.role === 'COMPANY') {
+            groupedByMonth[userMonth].activeCompany++;
+          } else if (user.role === 'VOLUNTEER') {
+            groupedByMonth[userMonth].activeVolunteer++;
+          }
+        });
+  
+        // Group events by month
+        allEvents.forEach(event => {
+          const eventMonth = new Date(event.createdAt).getMonth() + 1;
+          if (!eventsByMonth[eventMonth]) {
+            eventsByMonth[eventMonth] = 0;
+          }
+          eventsByMonth[eventMonth]++;
+        });
+  
+        const activeCompanyData = [];
+        const activeVolunteerData = [];
+        const registeredEvents = [];
+  
+        for (let month = 1; month <= 12; month++) {
+          const monthCompanyData = groupedByMonth[month] || { activeCompany: 0, activeVolunteer: 0 };
+          activeCompanyData.push(monthCompanyData.activeCompany);
+          activeVolunteerData.push(monthCompanyData.activeVolunteer);
+  
+          const monthEventData = eventsByMonth[month] || 0;
+          registeredEvents.push(monthEventData);
+        }
+  
+        const chartData = [
+          { name: 'Company', data: activeCompanyData },
+          { name: 'Volunteer', data: activeVolunteerData },
+          { name: 'Events', data: registeredEvents }
+        ];
+  
+        return chartData;
+      } catch (error) {
+        console.error('Error fetching chart data:', error);
+        throw new Error('Error fetching chart data');
+      }
+  }
+  
+  // Assuming eventService.getAllEvents() returns a Promise that resolves to an array of event objects
+  
+
 
 module.exports = {
     createUser,
@@ -210,5 +278,6 @@ module.exports = {
     updateUserAppointedBy,
     getAllVolunteerUsersByCompanyId,
     getUserByIds,
-    getChartData
+    getChartData,
+    getLineChartData
 }

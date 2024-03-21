@@ -11,6 +11,7 @@ router.put('/appointedBy/:id', signupController.updateUserAppointedBy)
 router.get('/volunteer-users/:id', signupController.getAllVolunteerUsersByCompanyId);
 router.post('/getByIds', signupController.getUserByIds);
 router.get('/bar-chart-data', signupController.getChartData);
+router.get('/line-chart-data', signupController.getLineChartData)
 
 
 

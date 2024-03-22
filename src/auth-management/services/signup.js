@@ -28,17 +28,66 @@ async function createUser(name, email, password, role, skills, phone, location) 
     return user['dataValues']
 };
 
+async function deleteUserById(userId) {
+  try {
+      const user = await User.findByPk(userId);
+      if (!user) {
+          throw new Error('User not found');
+      }
+      await user.destroy();
+      return { message: 'User deleted successfully' };
+  } catch (error) {
+      console.error('Error deleting user:', error);
+      throw error;
+  }
+}
+
 async function getAllUser() {
     try {
         const users = await User.findAll({
-            attributes: { exclude: ['password'] }
+            attributes: { exclude: ['password'] },
+            order: [['createdAt', 'DESC']]
         });
-
         const formattedUsers = users.map(user => user.toJSON());
         return formattedUsers;
     } catch (error) {
         throw error;
     }
+}
+
+async function updateUserById(userId, userData) {
+  try {
+    const user = await User.findByPk(userId);
+    
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    if (userData.name) {
+      user.name = userData.name;
+    }
+    if (userData.email) {
+      user.email = userData.email;
+    }
+    if (userData.skills) {
+      user.skills = userData.skills;
+    }
+    if (userData.phone) {
+      user.phone = userData.phone;
+    }
+    if (userData.location) {
+      user.location = userData.location;
+    }
+    if (userData.role) {
+      user.role = userData.role;
+    }
+
+    await user.save();
+    return user;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
 async function getAllVolunteerUsers() {
@@ -157,49 +206,104 @@ async function getUserByIds(ids) {
     }
 }
 
+// async function getChartData() {
+//     try {
+//       const activeUsers = await this.getAllUser();  
+//       const users2024 = activeUsers.filter(user => {
+//         const userYear = new Date(user.createdAt).getFullYear();
+//         return userYear === 2023;
+//       });
+  
+//       const groupedByMonth = {};
+//       users2024.forEach(user => {
+//         const userMonth = new Date(user.createdAt).getMonth() + 1; 
+//         if (!groupedByMonth[userMonth]) {
+//           groupedByMonth[userMonth] = {
+//             activeCompany: 0,
+//             activeVolunteer: 0
+//           };
+//         }
+//         if (user.role === 'COMPANY') {
+//           groupedByMonth[userMonth].activeCompany++;
+//         } else if (user.role === 'VOLUNTEER') {
+//           groupedByMonth[userMonth].activeVolunteer++;
+//         }
+//       });
+  
+//       const activeCompanyData = [];
+//       const activeVolunteerData = [];
+//       for (let month = 1; month <= 12; month++) {
+//         const monthData = groupedByMonth[month] || { activeCompany: 0, activeVolunteer: 0 };
+//         activeCompanyData.push(monthData.activeCompany);
+//         activeVolunteerData.push(monthData.activeVolunteer);
+//       }
+  
+//       const chartData = [
+//         { name: 'Active Company', data: activeCompanyData },
+//         { name: 'Active Volunteer', data: activeVolunteerData }
+//       ];
+  
+//       return chartData;
+//     } catch (error) {
+//       console.error('Error fetching chart data:', error);
+//       throw new Error('Error fetching chart data');
+//     }
+//   }
+
 async function getChartData() {
-    try {
-      const activeUsers = await this.getAllUser();  
-      const users2024 = activeUsers.filter(user => {
-        const userYear = new Date(user.createdAt).getFullYear();
-        return userYear === 2024;
-      });
-  
-      const groupedByMonth = {};
-      users2024.forEach(user => {
-        const userMonth = new Date(user.createdAt).getMonth() + 1; 
-        if (!groupedByMonth[userMonth]) {
-          groupedByMonth[userMonth] = {
-            activeCompany: 0,
-            activeVolunteer: 0
-          };
-        }
-        if (user.role === 'COMPANY') {
-          groupedByMonth[userMonth].activeCompany++;
-        } else if (user.role === 'VOLUNTEER') {
-          groupedByMonth[userMonth].activeVolunteer++;
-        }
-      });
-  
-      const activeCompanyData = [];
-      const activeVolunteerData = [];
-      for (let month = 1; month <= 12; month++) {
-        const monthData = groupedByMonth[month] || { activeCompany: 0, activeVolunteer: 0 };
-        activeCompanyData.push(monthData.activeCompany);
-        activeVolunteerData.push(monthData.activeVolunteer);
+  try {
+    const activeUsers = await this.getAllUser();  
+    const users2024 = activeUsers.filter(user => {
+      const userYear = new Date(user.createdAt).getFullYear();
+      return userYear === 2023;
+    });
+
+    const groupedByMonth = {};
+    users2024.forEach(user => {
+      const userMonth = new Date(user.createdAt).getMonth() + 1; 
+      if (!groupedByMonth[userMonth]) {
+        groupedByMonth[userMonth] = {
+          activeCompany: { Active: 0, Inactive: 0 },
+          activeVolunteer: { Active: 0, Inactive: 0 }
+        };
       }
-  
-      const chartData = [
-        { name: 'Active Company', data: activeCompanyData },
-        { name: 'Active Volunteer', data: activeVolunteerData }
-      ];
-  
-      return chartData;
-    } catch (error) {
-      console.error('Error fetching chart data:', error);
-      throw new Error('Error fetching chart data');
+      if (user.role === 'COMPANY') {
+        groupedByMonth[userMonth].activeCompany[user.status]++;
+      } else if (user.role === 'VOLUNTEER') {
+        groupedByMonth[userMonth].activeVolunteer[user.status]++;
+      }
+    });
+
+    const activeCompanyData = [];
+    const activeVolunteerData = [];
+    const inactiveCompanyData = [];
+    const inactiveVolunteerData = [];
+
+    for (let month = 1; month <= 12; month++) {
+      const monthData = groupedByMonth[month] || { activeCompany: { Active: 0, Inactive: 0 }, activeVolunteer: { Active: 0, Inactive: 0 } };
+      
+      activeCompanyData.push(monthData.activeCompany.Active);
+      activeVolunteerData.push(monthData.activeVolunteer.Active);
+
+      inactiveCompanyData.push(monthData.activeCompany.Inactive);
+      inactiveVolunteerData.push(monthData.activeVolunteer.Inactive);
     }
+
+    const chartData = [
+      { name: 'Active Company', data: activeCompanyData },
+      { name: 'Active Volunteer', data: activeVolunteerData },
+      { name: 'Inactive Company', data: inactiveCompanyData },
+      { name: 'Inactive Volunteer', data: inactiveVolunteerData }
+    ];
+
+    return chartData;
+  } catch (error) {
+    console.error('Error fetching chart data:', error);
+    throw new Error('Error fetching chart data');
   }
+}
+
+
 
   async function getLineChartData(){
     try {
@@ -208,7 +312,7 @@ async function getChartData() {
   
         const users2024 = activeUsers.filter(user => {
           const userYear = new Date(user.createdAt).getFullYear();
-          return userYear === 2024;
+          return userYear === 2023;
         });
   
         const groupedByMonth = {};
@@ -279,5 +383,7 @@ module.exports = {
     getAllVolunteerUsersByCompanyId,
     getUserByIds,
     getChartData,
-    getLineChartData
+    getLineChartData,
+    updateUserById,
+    deleteUserById
 }

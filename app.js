@@ -27,7 +27,6 @@ app.post('/auth/login', login_controller.login);
 const eventRoutes = require('./src/auth-management/routes/event_post_route')
 app.use('/event', eventRoutes)
 
-
 sequelize.sync()
   .then(() => {
       console.log('Database synchronized successfully.');

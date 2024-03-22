@@ -37,7 +37,10 @@ const User = sequelize.define('user', {
         type: DataTypes.ARRAY(DataTypes.STRING),
         allowNull: true,
         defaultValue: [] 
-    }
+    },
+    status: {
+        type: DataTypes.STRING
+    },
 });
 
 module.exports = User;

@@ -1,7 +1,7 @@
 local:
   dialect: postgres
   username: postgres
-  password: ayush123
+  password: techrover123
   database: new_db
   host: localhost
   port: 3001

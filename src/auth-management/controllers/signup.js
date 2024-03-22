@@ -74,6 +74,19 @@ async function updateUserAppointedBy(req, res) {
     }
   }
 
+  async function updateUserById(req, res) {
+    try {
+      const userId = req.params.id; 
+      const userData = req.body;   
+      const updatedUser = await signupService.updateUserById(userId, userData);
+        
+      res.send(updatedUser, 200, "Data fetched succesfully", "Error");
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Something went wrong, please try again later', error: error.message });
+    }
+  }
+
   async function getAllVolunteerUsersByCompanyId(req, res, next) {
     const  companyId  = req.params;
     console.log("Company Id__", companyId.id)
@@ -119,6 +132,17 @@ async function getChartData(req, res) {
     }
   }
 
+  async function deleteUserById(req, res) {
+    const userId = req.params.id; 
+    try {
+        const result = await signupService.deleteUserById(userId);
+        res.send(result, 200, "User Deleted Successfully", "Error")
+    } catch (error) {
+        res.send(null, 500, "Something went wrong", "Error")
+        // res.status(500).json({ error: error.message }); 
+    }
+}
+
 module.exports = {
     signup,
     getAllUsers,
@@ -129,5 +153,7 @@ module.exports = {
     getAllVolunteerUsersByCompanyId,
     getUserByIds,
     getChartData,
-    getLineChartData
+    getLineChartData,
+    updateUserById,
+    deleteUserById
 }
